@@ -6,12 +6,16 @@ ARG FORGE_CLI_VERSION=5.0.0
 
 WORKDIR /work
 
-# Ensure CA certs + curl (helps with registry/TLS issues in CI runners)
 RUN apt-get update && apt-get install -y ca-certificates curl git \
   && update-ca-certificates \
   && rm -rf /var/lib/apt/lists/*
 
-# Install pnpm + forge-cli the reliable way (avoid corepack issues)
-RUN npm install -g pnpm@${PNPM_VERSION} @forge/cli@${FORGE_CLI_VERSION}
-
-# No COPY, no ENTRYPOINT
+# 🔎 Diagnostics + verbose npm install so GitLab logs show the true error
+RUN set -eux; \
+  node --version; \
+  npm --version; \
+  npm config get registry; \
+  curl -I https://registry.npmjs.org/; \
+  npm ping --registry=https://registry.npmjs.org/; \
+  npm config set loglevel verbose; \
+  npm install -g pnpm@${PNPM_VERSION} @forge/cli@${FORGE_CLI_VERSION}
