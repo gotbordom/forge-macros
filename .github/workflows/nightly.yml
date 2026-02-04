@@ -1,0 +1,42 @@
+name: Nightly
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Runs nightly at 02:00 UTC
+    - cron: "0 2 * * *"
+
+  # Run on every merge/push to main
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+  packages: read
+
+jobs:
+  unit-tests:
+    runs-on: ubuntu-latest
+    env:
+      CI_IMAGE: ghcr.io/${{ github.repository_owner }}/forge-ci:latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # Required if the GHCR image is private; harmless if public
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Pull hosted Forge CI image
+        run: docker pull "$CI_IMAGE"
+
+      - name: Run all unit tests (all Forge macros)
+        run: |
