@@ -6,12 +6,12 @@ ARG FORGE_CLI_VERSION=5.0.0
 
 WORKDIR /work
 
-# pinned tool versions
-RUN corepack enable && corepack prepare pnpm@${PNPM_VERSION} --activate \
-  && npm install -g @forge/cli@${FORGE_CLI_VERSION}
+# Ensure CA certs + curl (helps with registry/TLS issues in CI runners)
+RUN apt-get update && apt-get install -y ca-certificates curl git \
+  && update-ca-certificates \
+  && rm -rf /var/lib/apt/lists/*
 
-# optional small extras
-RUN apt-get update && apt-get install -y git && rm -rf /var/lib/apt/lists/*
+# Install pnpm + forge-cli the reliable way (avoid corepack issues)
+RUN npm install -g pnpm@${PNPM_VERSION} @forge/cli@${FORGE_CLI_VERSION}
 
-# no COPY of source to keep image generic — CI will mount repo workspace
-# no ENTRYPOINT or CMD so callers can run arbitrary commands e.g. `make test`
+# No COPY, no ENTRYPOINT
