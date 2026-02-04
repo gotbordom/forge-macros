@@ -1,0 +1,13 @@
+{
+  "name": "@forge-macros/types",
+  "private": true,
+  "version": "0.0.0",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": ["dist"],
+  "scripts": {
+    "build": "pnpm exec tsc -p tsconfig.json",
+    "lint": "pnpm exec eslint \"src/**/*.{ts,tsx}\"",
+    "typecheck": "pnpm exec tsc -p tsconfig.json --noEmit"
+  }
+}

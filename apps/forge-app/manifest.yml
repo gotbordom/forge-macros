@@ -1,0 +1,20 @@
+app:
+  id: ari:cloud:ecosystem::app/00000000-0000-0000-0000-000000000000
+
+runtime:
+  name: nodejs18.x
+
+permissions:
+  scopes:
+    - read:confluence-content.summary
+
+modules:
+  macro:
+    - key: last-edited-date
+      function: lastEditedDate
+      title: Last edited date
+      description: Example macro that displays a placeholder last-edited date.
+
+  function:
+    - key: lastEditedDate
+      handler: src/macros/last-edited-date/resolver.run

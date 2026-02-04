@@ -1,0 +1,12 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": ".",
+    "outDir": "dist",
+    "jsx": "react",
+    "jsxFactory": "ForgeUI.createElement",
+    "jsxFragmentFactory": "ForgeUI.Fragment",
+    "types": ["node"]
+  },
+  "include": ["src/**/*", "shared/**/*"]
+}
