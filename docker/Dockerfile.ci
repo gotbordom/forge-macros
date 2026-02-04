@@ -1,21 +1,23 @@
-# docker/Dockerfile.ci
-FROM node:18-bullseye
+# Dockerfile.ci
+FROM node:18-bullseye-slim
 
-ARG PNPM_VERSION=8.10.0
-ARG FORGE_CLI_VERSION=5.0.0
-
-WORKDIR /work
-
-RUN apt-get update && apt-get install -y ca-certificates curl git \
-  && update-ca-certificates \
+# Native build deps needed by node-gyp + keytar (Forge CLI pulls keytar)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates \
+    curl \
+    git \
+    python3 \
+    make \
+    g++ \
+    pkg-config \
+    libsecret-1-dev \
   && rm -rf /var/lib/apt/lists/*
 
-# 🔎 Diagnostics + verbose npm install so GitLab logs show the true error
-RUN set -eux; \
-  node --version; \
-  npm --version; \
-  npm config get registry; \
-  curl -I https://registry.npmjs.org/; \
-  npm ping --registry=https://registry.npmjs.org/; \
-  npm config set loglevel verbose; \
-  npm install -g pnpm@${PNPM_VERSION} @forge/cli@${FORGE_CLI_VERSION}
+# Ensure node-gyp uses python3
+ENV PYTHON=/usr/bin/python3
+
+# Install Forge CLI
+RUN npm config set python "$PYTHON" \
+  && npm i -g @forge/cli
+
+WORKDIR /app
