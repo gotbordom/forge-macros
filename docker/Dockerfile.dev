@@ -1,0 +1,24 @@
+# docker/Dockerfile.dev
+FROM node:18-bullseye
+
+ARG PNPM_VERSION=8.10.0
+ARG FORGE_CLI_VERSION=5.0.0
+
+WORKDIR /work
+
+# Core tooling (same versions as CI for parity)
+RUN corepack enable \
+ && corepack prepare pnpm@${PNPM_VERSION} --activate \
+ && npm install -g @forge/cli@${FORGE_CLI_VERSION}
+
+# Optional dev conveniences
+RUN apt-get update && apt-get install -y \
+    git \
+    curl \
+    bash \
+    && rm -rf /var/lib/apt/lists/*
+
+# Do NOT copy source — local dev mounts the repo
+# Keeps rebuilds fast and avoids node_modules bake-in
+
+CMD ["bash"]

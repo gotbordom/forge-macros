@@ -1,0 +1,17 @@
+# docker/Dockerfile.ci
+FROM node:18-bullseye
+
+ARG PNPM_VERSION=8.10.0
+ARG FORGE_CLI_VERSION=5.0.0
+
+WORKDIR /work
+
+# pinned tool versions
+RUN corepack enable && corepack prepare pnpm@${PNPM_VERSION} --activate \
+  && npm install -g @forge/cli@${FORGE_CLI_VERSION}
+
+# optional small extras
+RUN apt-get update && apt-get install -y git && rm -rf /var/lib/apt/lists/*
+
+# no COPY of source to keep image generic — CI will mount repo workspace
+# no ENTRYPOINT or CMD so callers can run arbitrary commands e.g. `make test`
