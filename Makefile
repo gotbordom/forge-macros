@@ -19,11 +19,6 @@ PNPM_STORE_VOL ?= $(PROJECT_NAME)-pnpm-store
 DOCKERFILE_DEV ?= docker/Dockerfile.dev
 DOCKERFILE_CI  ?= docker/Dockerfile.ci
 
-# Optional: if you maintain a "base" image layer for shared deps/tools.
-# If you don't have it, the build target will still work (it will just build dev+ci).
-DOCKERFILE_BASE ?= docker/Dockerfile.base
-BASE_IMAGE ?= $(PROJECT_NAME)-base
-
 # Forge token passthrough (optional; used only when you run forge commands)
 # export FORGE_API_TOKEN=...
 FORGE_ENV_VARS := -e FORGE_API_TOKEN
@@ -69,16 +64,7 @@ help:
 # -----------------------------
 # Setup Commands
 # -----------------------------
-build: build-base build-dev build-ci
-
-# Build a base image if docker/Dockerfile.base exists; otherwise no-op.
-build-base:
-	@if [ -f "$(DOCKERFILE_BASE)" ]; then \
-		echo ">>> Building base image: $(BASE_IMAGE)"; \
-		DOCKER_BUILDKIT=1 docker build -f "$(DOCKERFILE_BASE)" -t "$(BASE_IMAGE)" . ; \
-	else \
-		echo ">>> No $(DOCKERFILE_BASE) found; skipping base image build."; \
-	fi
+build: build-dev build-ci
 
 build-dev:
 	@echo ">>> Building dev image: $(DEV_IMAGE)"
